@@ -1,0 +1,1074 @@
+
+. 
+. local width 14.5cm
+
+. local reps 2000
+
+. 
+. local treatment1fill fcolor(gs8%40) lcolor(gs8%40)
+
+. local treatment2fill fcolor(none) lcolor(black) lwidth(medthin)
+
+. local treatment1marker msymbol(O) mcolor(gs8%60) mlcolor(gs6%60)
+
+. local treatment2marker msymbol(Sh) mcolor(black%70)
+
+. local legendtreatments legend(order(1 "VBB10" 2 "VBB60"))
+
+. 
+. ************************************
+. **# Load data and first manipulation
+. ************************************
+. 
+. use `datapath'/vbb_data, clear
+
+. 
+. generate abs_error = abs(switch - event_prob)
+
+. generate exact_report = abs_error == 2.5
+
+. 
+. bysort subject_id: egen mae_single = mean(cond(single_event, abs_error, .))
+
+. bysort subject_id: egen mae_composite = mean(cond(!single_event, abs_error, .
+> ))
+
+. label variable mae_single "Mean absolute error of matching probabilities (sin
+> gle events)"
+
+. label variable mae_composite "Mean absolute error of matching probabilities (
+> composite events)"
+
+. 
+. bysort subject_id: egen accurate_single = min(cond(single_event, exact_report
+> , .))
+
+. bysort subject_id: egen accurate_composite = min(cond(!single_event, exact_re
+> port, .))
+
+. bysort subject_id: egen accurate_all = min(exact_report)
+
+. label variable accurate_single "Switch interval contains true p for all singl
+> e events"
+
+. label variable accurate_composite "Switch interval contains true p for all co
+> mposite events"
+
+. label variable accurate_all "Switch interval contains true p for all six even
+> ts"
+
+. 
+. bysort subject_id: egen m_single_20 = max(cond(single_event & event_prob == 2
+> 0, switch, .))
+
+. bysort subject_id: egen m_single_30 = max(cond(single_event & event_prob == 3
+> 0, switch, .))
+
+. bysort subject_id: egen m_single_50 = max(cond(single_event & event_prob == 5
+> 0, switch, .))
+
+. bysort subject_id: egen m_composite_50 = max(cond(!single_event & event_prob 
+> == 50, switch, .))
+
+. bysort subject_id: egen m_composite_70 = max(cond(!single_event & event_prob 
+> == 70, switch, .))
+
+. bysort subject_id: egen m_composite_80 = max(cond(!single_event & event_prob 
+> == 80, switch, .))
+
+. 
+. generate ranked_single = m_single_20 < m_single_30 & m_single_30 < m_single_5
+> 0
+
+. generate ranked_composite = m_composite_50 < m_composite_70 & m_composite_70 
+> < m_composite_80
+
+. label variable ranked_single "Single events ranked in the right order"
+
+. label variable ranked_composite "Composite events ranked in the right order"
+
+. 
+. bysort subject_id: egen task_minutes = total(seconds_on_page / 60)
+
+. label variable task_minutes "Time spent on tasks (minutes)"
+
+. 
+. keep if first_row == 1
+(1,585 observations deleted)
+
+. 
+. *******************************************
+. **# Online Appendix Table B.1: demographics
+. *******************************************
+. 
+. eststo VBB10: estpost summarize agecat_1 agecat_2 agecat_3 agecat_4 agecat_5 
+> ///
+>         sex_male sex_female sex_prefer_not_to_say if treatment == 1
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd) 
+-------------+-------------------------------------------------------
+    agecat_1 |       162        162   .2160494    .170424   .4128245 
+    agecat_2 |       162        162   .2901235    .207231   .4552264 
+    agecat_3 |       162        162   .1604938   .1355724   .3682016 
+    agecat_4 |       162        162   .2098765   .1668584    .408483 
+    agecat_5 |       162        162   .1234568   .1088874   .3299808 
+    sex_male |       162        162   .4135802    .244038   .4940021 
+  sex_female |       162        162   .5864198    .244038   .4940021 
+sex_prefer~y |       162        162          0          0          0 
+
+             |    e(min)     e(max)     e(sum) 
+-------------+---------------------------------
+    agecat_1 |         0          1         35 
+    agecat_2 |         0          1         47 
+    agecat_3 |         0          1         26 
+    agecat_4 |         0          1         34 
+    agecat_5 |         0          1         20 
+    sex_male |         0          1         67 
+  sex_female |         0          1         95 
+sex_prefer~y |         0          0          0 
+
+. eststo VBB60: estpost summarize agecat_1 agecat_2 agecat_3 agecat_4 agecat_5 
+> ///
+>         sex_male sex_female sex_prefer_not_to_say if treatment == 2
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd) 
+-------------+-------------------------------------------------------
+    agecat_1 |       155        155   .2580645   .1927105   .4389881 
+    agecat_2 |       155        155   .2967742   .2100545    .458317 
+    agecat_3 |       155        155   .2064516   .1648932   .4060704 
+    agecat_4 |       155        155   .1806452   .1489736    .385971 
+    agecat_5 |       155        155   .0580645   .0550482   .2346235 
+    sex_male |       155        155   .4451613   .2485966   .4985946 
+  sex_female |       155        155   .5548387   .2485966   .4985946 
+sex_prefer~y |       155        155          0          0          0 
+
+             |    e(min)     e(max)     e(sum) 
+-------------+---------------------------------
+    agecat_1 |         0          1         40 
+    agecat_2 |         0          1         46 
+    agecat_3 |         0          1         32 
+    agecat_4 |         0          1         28 
+    agecat_5 |         0          1          9 
+    sex_male |         0          1         69 
+  sex_female |         0          1         86 
+sex_prefer~y |         0          0          0 
+
+. 
+. esttab VBB10 VBB60 using `resultspath'/summary_statistics.tex, replace ///
+>         fragment nogap booktabs ///
+>         cells(mean(fmt(2))) collabels(none) ///
+>         nonumbers mtitles("VBB10" "VBB60") ///
+>         varlabels( ///
+>                 agecat_1 "18--27" ///
+>                 agecat_2 "28--37" ///
+>                 agecat_3 "38--47" ///
+>                 agecat_4 "48--57" ///
+>                 agecat_5 "58+" ///
+>                 sex_male "Male" ///
+>                 sex_female "Female" ///
+>                 sex_prefer_not_to_say "Prefer not to say" ///
+>                 ) ///
+>         refcat(agecat_1 "Age:" sex_male "\addlinespace Sex:", nolabel) ///
+>         stats(N, fmt(0) labels("Observations"))
+(output written to results/summary_statistics.tex)
+
+. 
+. eststo clear
+
+. 
+. ***************************************************
+. **# Online Appendix Figure C.1: indices of subjects
+. ***************************************************
+. 
+. local jitter jitter(2)
+
+. local axislines yline(0) xline(0)
+
+. local a_range range(-1.3 4.3)
+
+. local b_range range(-1.05 0.65)
+
+. local a_bins start(-1.125) width(0.25)
+
+. local b_bins start(-0.975) width(0.1)
+
+. local percent_range range(0 50)
+
+. local percent_labels 0 " " 25 50
+
+. local margin_size 20
+
+. local panel_margins plotregion(margin(zero)) graphregion(margin(zero))
+
+. 
+. sort subject_id
+
+. set seed 5334
+
+. twoway  (scatter b a if treatment == 1, `treatment1marker' `jitter') ///
+>                 (scatter b a if treatment == 2, `treatment2marker' `jitter'),
+>  ///
+>                 `axislines' ///
+>                 xscale(`a_range') xlabel(-1(1)4) xtitle("a-index") ///
+>                 yscale(`b_range') ylabel(-1(0.5)0.5) ytitle("b-index") ///
+>                 `legendtreatments' `panel_margins' plotregion(lcolor(black)) 
+> name(indices_scatter)
+
+. 
+. twoway  (histogram b if treatment == 1, horizontal percent `b_bins' `treatmen
+> t1fill') ///
+>                 (histogram b if treatment == 2, horizontal percent `b_bins' `
+> treatment2fill'), ///
+>                 yscale(`b_range' off) ///
+>                 xscale(`percent_range') xlabel(`percent_labels') xtitle("Perc
+> ent") ///
+>                 legend(off) `panel_margins' fxsize(`margin_size') name(b_inde
+> x_margin)
+
+. 
+. twoway  (histogram a if treatment == 1, percent `a_bins' `treatment1fill') //
+> /
+>                 (histogram a if treatment == 2, percent `a_bins' `treatment2f
+> ill'), ///
+>                 xscale(`a_range' off) ///
+>                 yscale(`percent_range') ylabel(`percent_labels') ytitle("Perc
+> ent") ///
+>                 legend(off) `panel_margins' fysize(`margin_size') name(a_inde
+> x_margin)
+
+. 
+. grc1leg2 a_index_margin indices_scatter b_index_margin, cols(2) holes(2) imar
+> gin(zero) ///
+>         legendfrom(indices_scatter) lcols(1) position(1) ring(0) xsize(`width
+> ') ysize(`width')
+-grc1leg2- working...
+
+Note: To preserve in a saved graphics file the legend's row and column rearrang
+> ements
+made with the options -lrows()- and/or -lcols()-, specify the suboption -asis-
+for the saving() option or for the graph save command.
+
+
+. graph export `resultspath'/indices_scatter_marginals.pdf, replace
+file results/indices_scatter_marginals.pdf saved as PDF format
+
+. 
+. *********************************************************
+. **# Figures 2 and 3: histograms of matching probabilities
+. *********************************************************
+. 
+. local filled fcolor(gs8%40) lcolor(gs8%40)
+
+. local outlined fcolor(none) lcolor(black) lwidth(medthin)
+
+. local dashed fcolor(none) lcolor(gs6) lwidth(medthick) lpattern(longdash)
+
+. local eventline lpattern(dash) lwidth(thin) lcolor(gs8)
+
+. local matchaxes xlabel(0(10)100) xtitle("Matching probability") ytitle("Densi
+> ty")
+
+. 
+. local single_flag 1
+
+. local single_probs 20 30 50
+
+. local single_edges 0 1 2 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 85 100
+
+. 
+. local composite_flag 0
+
+. local composite_probs 50 70 80
+
+. local composite_edges 0 20 35 40 45 50 55 60 65 70 75 80 85 90 93 95 97 98 99
+>  100
+
+. 
+. preserve
+
+. 
+. foreach set in single composite {
+  2.         local p1 : word 1 of ``set'_probs'
+  3.         local p2 : word 2 of ``set'_probs'
+  4.         local p3 : word 3 of ``set'_probs'
+  5. 
+.         clear
+  6.         local n_bins = wordcount("``set'_edges'") - 1
+  7.         set obs `n_bins'
+  8.         generate bin_lo = real(word("``set'_edges'", _n))
+  9.         generate bin_hi = real(word("``set'_edges'", _n + 1))
+ 10.         tempfile bins
+ 11.         quietly save `bins'
+ 12. 
+.         use `datapath'/vbb_data, clear
+ 13.         keep if single_event == ``set'_flag'
+ 14.         keep subject_id treatment event_prob switch
+ 15.         cross using `bins'
+ 16.         generate n = switch > bin_lo & switch < bin_hi
+ 17. 
+.         bysort subject_id event_prob: egen bins_hit = total(n)
+ 18.         assert bins_hit == 1
+ 19. 
+.         collapse (sum) n, by(treatment event_prob bin_lo bin_hi)
+ 20.         bysort treatment event_prob: egen total = total(n)
+ 21.         generate density = n / (total * (bin_hi - bin_lo))
+ 22. 
+.         expand 2
+ 23.         bysort treatment event_prob bin_lo: generate x = cond(_n == 1, bin
+> _lo, bin_hi)
+ 24.         sort treatment event_prob bin_lo x
+ 25.         generate zero = 0
+ 26. 
+.         twoway  (rarea zero density x if event_prob == `p1', `filled') ///
+>                         (rarea zero density x if event_prob == `p2', `outline
+> d') ///
+>                         (rarea zero density x if event_prob == `p3', `dashed'
+> ), ///
+>                         xline(``set'_probs', `eventline') ///
+>                         `matchaxes' ///
+>                         by(treatment, cols(1) note("")) subtitle(, nobox) ///
+>                         legend(order(1 "p = `p1'" 2 "p = `p2'" 3 "p = `p3'") 
+> rows(1)) ///
+>                         xsize(`width') ysize(16cm)
+ 27.         graph export `resultspath'/matching_prob_hist_`set'.pdf, replace
+ 28. }
+Number of observations (_N) was 0, now 19.
+(951 observations deleted)
+(114 observations created)
+file results/matching_prob_hist_single.pdf saved as PDF format
+Number of observations (_N) was 0, now 19.
+(951 observations deleted)
+(114 observations created)
+file results/matching_prob_hist_composite.pdf saved as PDF format
+
+. 
+. restore
+
+. 
+. ******************************
+. **# Figure 4: calibration plot
+. ******************************
+. 
+. preserve
+
+. 
+. use `datapath'/vbb_data, clear
+
+. sort subject_id task_order
+
+. 
+. tempname calibration_handle
+
+. tempfile calibration
+
+. postfile `calibration_handle' treatment single_event event_prob mean ci_lo ci
+> _hi using `calibration'
+
+. 
+. set seed 5334
+
+. levelsof event, local(events)
+1 2 3 4 5 6
+
+. foreach treat in 1 2 {
+  2.         foreach e of local events {
+  3.                 summarize event_prob if event == `e', meanonly
+  4.                 local p = r(mean)
+  5.                 local single = inlist(`e', 1, 2, 4)
+  6.                 quietly bootstrap mean = r(mean), reps(`reps'): summarize 
+> switch if treatment == `treat' & event == `e'
+  7.                 matrix ci = e(ci_percentile)
+  8.                 post `calibration_handle' (`treat') (`single') (`p') (_b[m
+> ean]) (ci[1, 1]) (ci[2, 1])
+  9.         }
+ 10. }
+
+. postclose `calibration_handle'
+
+. 
+. use `calibration', clear
+
+. generate x = event_prob - 1 if treatment == 1
+(6 missing values generated)
+
+. replace x = event_prob + 1 if treatment == 2
+(6 real changes made)
+
+. sort treatment single_event event_prob
+
+. list treatment single_event event_prob mean ci_lo ci_hi, sepby(treatment sing
+> le_event)
+
+     +-----------------------------------------------------------------+
+     | treatm~t   single~t   event_~b       mean      ci_lo      ci_hi |
+     |-----------------------------------------------------------------|
+  1. |        1          0         50         55   53.06944   56.97685 |
+  2. |        1          0         70   68.10493   65.69907   70.31173 |
+  3. |        1          0         80    75.1358   72.70679   77.38734 |
+     |-----------------------------------------------------------------|
+  4. |        1          1         20   30.68827   27.74228   33.80864 |
+  5. |        1          1         30   35.77161   33.47222   38.17901 |
+  6. |        1          1         50   49.41667   47.48148   51.51389 |
+     |-----------------------------------------------------------------|
+  7. |        2          0         50   60.21936   57.80645   62.55161 |
+  8. |        2          0         70   65.15807   62.82258   67.49033 |
+  9. |        2          0         80   67.89355   65.46935   70.30968 |
+     |-----------------------------------------------------------------|
+ 10. |        2          1         20   36.06774   33.20161   39.22581 |
+ 11. |        2          1         30   38.18387   35.63548   40.72742 |
+ 12. |        2          1         50   43.96129   41.32581   46.50806 |
+     +-----------------------------------------------------------------+
+
+. 
+. twoway  (function y = x, range(0 100) `eventline') ///
+>                 (rcap ci_lo ci_hi x if treatment == 1, lcolor(black)) ///
+>                 (connected mean x if treatment == 1 & single_event == 1, lcol
+> or(black) lpattern(solid) mcolor(black) msymbol(O)) ///
+>                 (connected mean x if treatment == 1 & single_event == 0, lcol
+> or(black) lpattern(solid) mcolor(black) msymbol(O)) ///
+>                 (rcap ci_lo ci_hi x if treatment == 2, lcolor(gs7)) ///
+>                 (connected mean x if treatment == 2 & single_event == 1, lcol
+> or(gs7) lpattern(dash) mcolor(gs7) msymbol(Oh)) ///
+>                 (connected mean x if treatment == 2 & single_event == 0, lcol
+> or(gs7) lpattern(dash) mcolor(gs7) msymbol(Oh)), ///
+>                 xlabel(0(10)100) ylabel(0(10)100) aspect(1) ///
+>                 xtitle("True probability") ytitle("Mean matching probability"
+> ) ///
+>                 legend(order(3 "VBB10" 6 "VBB60" 1 "Report = true probability
+> ") rows(1) position(6)) ///
+>                 xsize(`width') ysize(`width')
+
+. graph export `resultspath'/matching_prob_calibration.pdf, replace
+file results/matching_prob_calibration.pdf saved as PDF format
+
+. 
+. restore
+
+. 
+. ***********************************************************************
+. **# Accuracy of matching probabilities (Section 4, Online Appendix C.1)
+. ***********************************************************************
+. 
+. foreach set in single composite {
+  2.         bysort treatment: summarize mae_`set'
+  3.         ranksum mae_`set', by(treatment)
+  4.         display "MAE `set': MWU two-sided p = " 2 * normal(-abs(r(z)))
+  5. }
+
+-------------------------------------------------------------------------------
+-> treatment = VBB10
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+  mae_single |        162    11.15844    11.14375        2.5   59.16667
+
+-------------------------------------------------------------------------------
+-> treatment = VBB60
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+  mae_single |        155    15.62796    8.868545        2.5   59.16667
+
+
+Two-sample Wilcoxon rank-sum (Mann–Whitney) test
+
+   treatment |      Obs    Rank sum    Expected
+-------------+---------------------------------
+       VBB10 |      162       20862       25758
+       VBB60 |      155       29541       24645
+-------------+---------------------------------
+    Combined |      317       50403       50403
+
+Unadjusted variance   665415.00
+Adjustment for ties    -5200.25
+                     ----------
+Adjusted variance     660214.75
+
+H0: mae_si~e(treatm~t==VBB10) = mae_si~e(treatm~t==VBB60)
+         z = -6.026
+Prob > |z| = 0.0000
+
+Note: Exact p-value is not computed by default for sample sizes > 200.
+      Use option exact to compute it.
+MAE single: MWU two-sided p = 1.685e-09
+
+-------------------------------------------------------------------------------
+-> treatment = VBB10
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+mae_compos~e |        162    10.26749    8.465685        2.5         43
+
+-------------------------------------------------------------------------------
+-> treatment = VBB60
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+mae_compos~e |        155    13.50968    7.498442        2.5   56.66667
+
+
+Two-sample Wilcoxon rank-sum (Mann–Whitney) test
+
+   treatment |      Obs    Rank sum    Expected
+-------------+---------------------------------
+       VBB10 |      162       21717       25758
+       VBB60 |      155       28686       24645
+-------------+---------------------------------
+    Combined |      317       50403       50403
+
+Unadjusted variance   665415.00
+Adjustment for ties    -5025.91
+                     ----------
+Adjusted variance     660389.09
+
+H0: mae_co~e(treatm~t==VBB10) = mae_co~e(treatm~t==VBB60)
+         z = -4.973
+Prob > |z| = 0.0000
+
+Note: Exact p-value is not computed by default for sample sizes > 200.
+      Use option exact to compute it.
+MAE composite: MWU two-sided p = 6.604e-07
+
+. 
+. foreach set in single composite {
+  2.         tabulate ranked_`set' treatment, column exact
+  3.         display "Ranked `set': Fisher two-sided p = " r(p_exact)
+  4. }
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+    Single |
+    events |
+ ranked in |
+ the right |       Treatment
+     order |     VBB10      VBB60 |     Total
+-----------+----------------------+----------
+         0 |        80        127 |       207 
+           |     49.38      81.94 |     65.30 
+-----------+----------------------+----------
+         1 |        82         28 |       110 
+           |     50.62      18.06 |     34.70 
+-----------+----------------------+----------
+     Total |       162        155 |       317 
+           |    100.00     100.00 |    100.00 
+
+           Fisher's exact =                 0.000
+   1-sided Fisher's exact =                 0.000
+Ranked single: Fisher two-sided p = 1.069e-09
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+ Composite |
+    events |
+ ranked in |
+ the right |       Treatment
+     order |     VBB10      VBB60 |     Total
+-----------+----------------------+----------
+         0 |        81        125 |       206 
+           |     50.00      80.65 |     64.98 
+-----------+----------------------+----------
+         1 |        81         30 |       111 
+           |     50.00      19.35 |     35.02 
+-----------+----------------------+----------
+     Total |       162        155 |       317 
+           |    100.00     100.00 |    100.00 
+
+           Fisher's exact =                 0.000
+   1-sided Fisher's exact =                 0.000
+Ranked composite: Fisher two-sided p = 1.093e-08
+
+. 
+. foreach set in single composite all {
+  2.         tabulate accurate_`set' treatment, column exact
+  3.         display "Accurate `set': Fisher two-sided p = " r(p_exact)
+  4. }
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+    Switch |
+  interval |
+  contains |
+true p for |
+all single |       Treatment
+    events |     VBB10      VBB60 |     Total
+-----------+----------------------+----------
+         0 |       111        154 |       265 
+           |     68.52      99.35 |     83.60 
+-----------+----------------------+----------
+         1 |        51          1 |        52 
+           |     31.48       0.65 |     16.40 
+-----------+----------------------+----------
+     Total |       162        155 |       317 
+           |    100.00     100.00 |    100.00 
+
+           Fisher's exact =                 0.000
+   1-sided Fisher's exact =                 0.000
+Accurate single: Fisher two-sided p = 4.507e-16
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+    Switch |
+  interval |
+  contains |
+true p for |
+       all |
+ composite |       Treatment
+    events |     VBB10      VBB60 |     Total
+-----------+----------------------+----------
+         0 |       112        154 |       266 
+           |     69.14      99.35 |     83.91 
+-----------+----------------------+----------
+         1 |        50          1 |        51 
+           |     30.86       0.65 |     16.09 
+-----------+----------------------+----------
+     Total |       162        155 |       317 
+           |    100.00     100.00 |    100.00 
+
+           Fisher's exact =                 0.000
+   1-sided Fisher's exact =                 0.000
+Accurate composite: Fisher two-sided p = 1.055e-15
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+    Switch |
+  interval |
+  contains |
+true p for |
+   all six |       Treatment
+    events |     VBB10      VBB60 |     Total
+-----------+----------------------+----------
+         0 |       124        155 |       279 
+           |     76.54     100.00 |     88.01 
+-----------+----------------------+----------
+         1 |        38          0 |        38 
+           |     23.46       0.00 |     11.99 
+-----------+----------------------+----------
+     Total |       162        155 |       317 
+           |    100.00     100.00 |    100.00 
+
+           Fisher's exact =                 0.000
+   1-sided Fisher's exact =                 0.000
+Accurate all: Fisher two-sided p = 8.611e-13
+
+. 
+. *************************************
+. **# Mann-Whitney tests on the indices
+. *************************************
+. 
+. ranksum b, by(treatment)
+
+Two-sample Wilcoxon rank-sum (Mann–Whitney) test
+
+   treatment |      Obs    Rank sum    Expected
+-------------+---------------------------------
+       VBB10 |      162     25514.5       25758
+       VBB60 |      155     24888.5       24645
+-------------+---------------------------------
+    Combined |      317       50403       50403
+
+Unadjusted variance   665415.00
+Adjustment for ties    -1741.77
+                     ----------
+Adjusted variance     663673.23
+
+H0: b(treatm~t==VBB10) = b(treatm~t==VBB60)
+         z = -0.299
+Prob > |z| = 0.7650
+
+Note: Exact p-value is not computed by default for sample sizes > 200.
+      Use option exact to compute it.
+
+. display "b-index: MWU two-sided p = " 2 * normal(-abs(r(z)))
+b-index: MWU two-sided p = .7650185
+
+. 
+. ranksum a, by(treatment)
+
+Two-sample Wilcoxon rank-sum (Mann–Whitney) test
+
+   treatment |      Obs    Rank sum    Expected
+-------------+---------------------------------
+       VBB10 |      162     25090.5       25758
+       VBB60 |      155     25312.5       24645
+-------------+---------------------------------
+    Combined |      317       50403       50403
+
+Unadjusted variance   665415.00
+Adjustment for ties    -1879.77
+                     ----------
+Adjusted variance     663535.23
+
+H0: a(treatm~t==VBB10) = a(treatm~t==VBB60)
+         z = -0.819
+Prob > |z| = 0.4125
+
+Note: Exact p-value is not computed by default for sample sizes > 200.
+      Use option exact to compute it.
+
+. display "a-index: MWU two-sided p = " 2 * normal(-abs(r(z)))
+a-index: MWU two-sided p = .41253314
+
+. display "a-index: MWU one-sided p (VBB60 > VBB10) = " normal(r(z))
+a-index: MWU one-sided p (VBB60 > VBB10) = .20626657
+
+. 
+. *********************************************************
+. **# Correlation between the indices (Online Appendix C.2)
+. *********************************************************
+. 
+. pwcorr a b, sig
+
+             |        a        b
+-------------+------------------
+           a |   1.0000 
+             |
+             |
+           b |  -0.1577   1.0000 
+             |   0.0049
+             |
+
+. 
+. **********************************************
+. **# Online Appendix Table C.1: OLS regressions
+. **********************************************
+. 
+. local controls i.agecat i.sex
+
+. local controls_extended i.agecat i.sex task_minutes fps
+
+. local standarderrors vce(robust)
+
+. 
+. program define display_treatment_p_values
+  1.         local t_statistic = _b[2.treatment] / _se[2.treatment]
+  2.         display "`e(depvar)'-index: VBB60 coefficient = " _b[2.treatment]
+  3.         display "`e(depvar)'-index: two-sided p = " 2 * ttail(e(df_r), abs
+> (`t_statistic'))
+  4.         display "`e(depvar)'-index: one-sided p (VBB60 > VBB10) = " ttail(
+> e(df_r), `t_statistic')
+  5. end
+
+. 
+. eststo: reg a i.treatment, `standarderrors'
+
+Linear regression                               Number of obs     =        317
+                                                F(1, 315)         =       1.58
+                                                Prob > F          =     0.2098
+                                                R-squared         =     0.0050
+                                                Root MSE          =     .51501
+
+------------------------------------------------------------------------------
+             |               Robust
+           a | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treatment |
+      VBB60  |   .0730613    .058137     1.26   0.210    -.0413245    .1874472
+       _cons |    .176358   .0360012     4.90   0.000     .1055248    .2471913
+------------------------------------------------------------------------------
+(est1 stored)
+
+. display_treatment_p_values
+a-index: VBB60 coefficient = .07306133
+a-index: two-sided p = .2097897
+a-index: one-sided p (VBB60 > VBB10) = .10489485
+
+. eststo: reg b i.treatment, `standarderrors'
+
+Linear regression                               Number of obs     =        317
+                                                F(1, 315)         =       0.20
+                                                Prob > F          =     0.6586
+                                                R-squared         =     0.0006
+                                                Root MSE          =     .17675
+
+------------------------------------------------------------------------------
+             |               Robust
+           b | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treatment |
+      VBB60  |    .008778   .0198469     0.44   0.659    -.0302712    .0478273
+       _cons |  -.0470576   .0140803    -3.34   0.001     -.074761   -.0193543
+------------------------------------------------------------------------------
+(est2 stored)
+
+. display_treatment_p_values
+b-index: VBB60 coefficient = .00877804
+b-index: two-sided p = .65858437
+b-index: one-sided p (VBB60 > VBB10) = .32929218
+
+. eststo: reg a i.treatment `controls', `standarderrors'
+
+Linear regression                               Number of obs     =        317
+                                                F(6, 310)         =       2.50
+                                                Prob > F          =     0.0225
+                                                R-squared         =     0.0406
+                                                Root MSE          =     .50978
+
+------------------------------------------------------------------------------
+             |               Robust
+           a | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treatment |
+      VBB60  |   .0944419   .0575567     1.64   0.102    -.0188092     .207693
+             |
+      agecat |
+      28-37  |   .1686646   .0840289     2.01   0.046     .0033255    .3340036
+      38-47  |  -.0382032    .076417    -0.50   0.617    -.1885647    .1121583
+      48-57  |   .1150497   .0903217     1.27   0.204    -.0626714    .2927708
+        58+  |   .2594797   .1055947     2.46   0.015     .0517066    .4672527
+             |
+         sex |
+     Female  |   .0131581   .0575461     0.23   0.819    -.1000723    .1263886
+       _cons |   .0696589   .0741465     0.94   0.348    -.0762351    .2155529
+------------------------------------------------------------------------------
+(est3 stored)
+
+. display_treatment_p_values
+a-index: VBB60 coefficient = .0944419
+a-index: two-sided p = .10184257
+a-index: one-sided p (VBB60 > VBB10) = .05092129
+
+. eststo: reg b i.treatment `controls', `standarderrors'
+
+Linear regression                               Number of obs     =        317
+                                                F(6, 310)         =       0.16
+                                                Prob > F          =     0.9871
+                                                R-squared         =     0.0046
+                                                Root MSE          =     .17782
+
+------------------------------------------------------------------------------
+             |               Robust
+           b | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treatment |
+      VBB60  |   .0067681   .0200285     0.34   0.736    -.0326408     .046177
+             |
+      agecat |
+      28-37  |    .007006   .0281882     0.25   0.804    -.0484585    .0624705
+      38-47  |   .0148844   .0295626     0.50   0.615    -.0432844    .0730531
+      48-57  |    .011276   .0322701     0.35   0.727    -.0522201    .0747722
+        58+  |  -.0267471   .0540238    -0.50   0.621    -.1330468    .0795527
+             |
+         sex |
+     Female  |   .0044377   .0204755     0.22   0.829    -.0358509    .0447263
+       _cons |  -.0531459   .0330425    -1.61   0.109    -.1181618    .0118701
+------------------------------------------------------------------------------
+(est4 stored)
+
+. display_treatment_p_values
+b-index: VBB60 coefficient = .00676811
+b-index: two-sided p = .73564896
+b-index: one-sided p (VBB60 > VBB10) = .36782448
+
+. eststo: reg a i.treatment `controls_extended', `standarderrors'
+
+Linear regression                               Number of obs     =        317
+                                                F(8, 308)         =       2.23
+                                                Prob > F          =     0.0254
+                                                R-squared         =     0.0494
+                                                Root MSE          =     .50909
+
+------------------------------------------------------------------------------
+             |               Robust
+           a | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treatment |
+      VBB60  |   .0882007   .0566217     1.56   0.120    -.0232137    .1996151
+             |
+      agecat |
+      28-37  |   .1720186   .0841975     2.04   0.042     .0063436    .3376936
+      38-47  |  -.0286766    .076564    -0.37   0.708    -.1793312     .121978
+      48-57  |   .1311347   .0916726     1.43   0.154    -.0492491    .3115185
+        58+  |   .2696585   .1070954     2.52   0.012     .0589273    .4803897
+             |
+         sex |
+     Female  |    .001826   .0576761     0.03   0.975    -.1116631     .115315
+task_minutes |  -.0326129   .0210056    -1.55   0.122    -.0739454    .0087197
+         fps |   .0012138   .0011825     1.03   0.305     -.001113    .0035406
+       _cons |   .0784015   .1380822     0.57   0.571    -.1933023    .3501054
+------------------------------------------------------------------------------
+(est5 stored)
+
+. display_treatment_p_values
+a-index: VBB60 coefficient = .08820069
+a-index: two-sided p = .12032705
+a-index: one-sided p (VBB60 > VBB10) = .06016353
+
+. eststo: reg b i.treatment `controls_extended', `standarderrors'
+
+Linear regression                               Number of obs     =        317
+                                                F(8, 308)         =       0.33
+                                                Prob > F          =     0.9538
+                                                R-squared         =     0.0091
+                                                Root MSE          =     .17799
+
+------------------------------------------------------------------------------
+             |               Robust
+           b | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treatment |
+      VBB60  |   .0100969   .0210786     0.48   0.632    -.0313793    .0515731
+             |
+      agecat |
+      28-37  |   .0086621   .0284395     0.30   0.761    -.0472983    .0646224
+      38-47  |   .0151397   .0294662     0.51   0.608    -.0428409    .0731203
+      48-57  |   .0134578   .0326874     0.41   0.681     -.050861    .0777765
+        58+  |  -.0245949   .0548992    -0.45   0.654    -.1326199    .0834301
+             |
+         sex |
+     Female  |   .0079126   .0222535     0.36   0.722    -.0358755    .0517006
+task_minutes |    .005047   .0098064     0.51   0.607     -.014249    .0243429
+         fps |   .0005214   .0004309     1.21   0.227    -.0003265    .0013693
+       _cons |  -.1046719   .0653916    -1.60   0.110    -.2333427     .023999
+------------------------------------------------------------------------------
+(est6 stored)
+
+. display_treatment_p_values
+b-index: VBB60 coefficient = .01009693
+b-index: two-sided p = .63226836
+b-index: one-sided p (VBB60 > VBB10) = .31613418
+
+. 
+. esttab using `resultspath'/ols_regressions.tex, replace ///
+>         fragment nogap booktabs ///
+>         b(3) se(3) ///
+>         label nobaselevels nodepvars nonumbers ///
+>         mtitles("{\(a\)-index}" "{\(b\)-index}" "{\(a\)-index}" "{\(b\)-index
+> }" "{\(a\)-index}" "{\(b\)-index}") ///
+>         refcat(2.agecat "\addlinespace Age category (ref.: 18--27)", nolabel)
+>  ///
+>         varlabels( ///
+>                 2.agecat "28--37" ///
+>                 3.agecat "38--47" ///
+>                 4.agecat "48--57" ///
+>                 _cons "Constant" ///
+>                 ) ///
+>         starlevels("\textsuperscript{\textbullet}" 0.10 "\textsuperscript{*}"
+>  0.05 "\textsuperscript{**}" 0.01 "\textsuperscript{***}" 0.001) ///
+>         stats( ///
+>                 N r2, ///
+>                 fmt(0 3) labels(`"Observations"' `"\(R^{2}\)"') ///
+>                 )
+(output written to results/ols_regressions.tex)
+
+. 
+. eststo clear
+
+. 
+. ***************************************
+. **# Figure 5: mean indices by treatment
+. ***************************************
+. 
+. sort subject_id
+
+. set seed 5334
+
+. bootstrap, reps(`reps') strata(treatment) nodots: mean a b, over(treatment)
+
+Mean estimation
+
+Number of strata = 2                      Number of obs =   317
+                                          Replications  = 2,000
+
+---------------------------------------------------------------
+              |   Observed   Bootstrap         Normal-based
+              |       mean   std. err.     [95% conf. interval]
+--------------+------------------------------------------------
+c.a@treatment |
+       VBB10  |    .176358   .0365983      .1046266    .2480894
+       VBB60  |   .2494194   .0473311      .1566521    .3421866
+              |
+c.b@treatment |
+       VBB10  |  -.0470576   .0139116     -.0743238   -.0197914
+       VBB60  |  -.0382796   .0140415     -.0658003   -.0107588
+---------------------------------------------------------------
+
+. estat bootstrap, percentile
+
+Mean estimation
+Number of strata   =          2                 Number of obs     =        317
+                                                Replications      =       2000
+
+------------------------------------------------------------------------------
+             |    Observed               Bootstrap
+             |        mean       Bias    std. err.  [95% conf. interval]
+-------------+----------------------------------------------------------------
+c.a@1bn.tr~t |   .17635802  -.0007918   .03659833    .1058179      .2475   (P)
+c.a@2.trea~t |   .24941935  -.0004682   .04733108    .1604355   .3436774   (P)
+c.b@1bn.tr~t |  -.04705761   .0004994   .01391158   -.0754681  -.0207716   (P)
+c.b@2.trea~t |  -.03827957   .0004324   .01404147   -.0653011  -.0108978   (P)
+------------------------------------------------------------------------------
+Key: P: Percentile
+
+. estimates store means_boot
+
+. 
+. coefplot (means_boot, keep(c.a@*) label("a-index") msymbol(Oh)) ///
+>         (means_boot, keep(c.b@*) label("b-index") msymbol(Sh)), ///
+>         ci(ci_percentile) ///
+>         rename(c.a@1.treatment = "VBB10" c.b@1.treatment = "VBB10" c.a@2.trea
+> tment = "VBB60" c.b@2.treatment = "VBB60") ///
+>         order(VBB10 VBB60) ///
+>         xline(0, lpattern(dot)) ytitle("Treatment") grid(none) xlabel(-0.1(0.
+> 1)0.4, grid glcolor(gs14) glpattern(solid)) ///
+>         legend(position(3) cols(1))
+
+. resize, xsize(`width') ysize(4cm)
+
+. graph export `resultspath'/means_bootstrap.pdf, replace
+file results/means_bootstrap.pdf saved as PDF format
+
+. 
+. estimates drop means_boot
+
+. 
+. *************************************************
+. **# Online Appendix Table C.2: comment categories
+. *************************************************
+. 
+. import delimited `datapath'/raw/comments.csv, clear encoding(utf-8) bindquote
+> (strict) varnames(1)
+(3 vars, 63 obs)
+
+. tabulate category treatment
+
+                   |       treatment
+          category |     VBB10      VBB60 |     Total
+-------------------+----------------------+----------
+        Engagement |        10         13 |        23 
+Neutral/No Comment |         9          8 |        17 
+  Technical Issues |         2          3 |         5 
+     Understanding |        10          8 |        18 
+-------------------+----------------------+----------
+             Total |        31         32 |        63 
+
+. 
+. *
+. * Stop logging
+. *
+. 
+. log close
