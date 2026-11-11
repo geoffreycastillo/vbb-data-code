@@ -1,5 +1,7 @@
 # The Virtual Bingo Blower: replication package
 
+[![DOI](https://zenodo.org/badge/1454188168.svg)](https://doi.org/10.5281/zenodo.24141025)
+
 This repository contains the data and code that reproduce the results in "[The Virtual Bingo Blower: An open-source tool to generate ambiguity and risk in experiments](https://geoffreycastillo.com/pdf/Andersson,Castillo,Wengstroem-The-Virtual-Bingo-Blower.pdf)" by Ola Andersson, Geoffrey Castillo and Erik Wengström, and in its Online Appendix.
 
 The oTree code of the experiment is at <https://github.com/geoffreycastillo/otree-virtual-bingo-blower>.
