@@ -274,6 +274,17 @@ foreach set in single composite all {
 	display "Accurate `set': Fisher two-sided p = " r(p_exact)
 }
 
+*******************************************************************
+**# Tests of the indices against ambiguity neutrality (Section 4)
+*******************************************************************
+
+foreach index in a b {
+	forvalues treat = 1/2 {
+		signrank `index' = 0 if treatment == `treat'
+		display "`index'-index, treatment `treat': Wilcoxon signed-rank two-sided p = " r(p)
+	}
+}
+
 *************************************
 **# Mann-Whitney tests on the indices
 *************************************

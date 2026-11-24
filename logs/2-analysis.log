@@ -676,6 +676,107 @@ true p for |
 Accurate all: Fisher two-sided p = 8.611e-13
 
 . 
+. *******************************************************************
+. **# Tests of the indices against ambiguity neutrality (Section 4)
+. *******************************************************************
+. 
+. foreach index in a b {
+  2.         forvalues treat = 1/2 {
+  3.                 signrank `index' = 0 if treatment == `treat'
+  4.                 display "`index'-index, treatment `treat': Wilcoxon signed
+> -rank two-sided p = " r(p)
+  5.         }
+  6. }
+
+Wilcoxon signed-rank test
+
+        Sign |      Obs   Sum ranks    Expected
+-------------+---------------------------------
+    Positive |       83      8695.5      6353.5
+    Negative |       48      4011.5      6353.5
+        Zero |       31         496         496
+-------------+---------------------------------
+         All |      162       13203       13203
+
+Unadjusted variance   357581.25
+Adjustment for ties     -178.25
+Adjustment for zeros   -2604.00
+                     ----------
+Adjusted variance     354799.00
+
+H0: a = 0 
+         z =  3.932
+Prob > |z| = 0.0001
+Exact prob = 0.0001
+a-index, treatment 1: Wilcoxon signed-rank two-sided p = .0000843
+
+Wilcoxon signed-rank test
+
+        Sign |      Obs   Sum ranks    Expected
+-------------+---------------------------------
+    Positive |       91      8624.5      6017.5
+    Negative |       54      3410.5      6017.5
+        Zero |       10          55          55
+-------------+---------------------------------
+         All |      155       12090       12090
+
+Unadjusted variance   313332.50
+Adjustment for ties     -231.12
+Adjustment for zeros     -96.25
+                     ----------
+Adjusted variance     313005.12
+
+H0: a = 0 
+         z =  4.660
+Prob > |z| = 0.0000
+Exact prob = 0.0000
+a-index, treatment 2: Wilcoxon signed-rank two-sided p = 3.165e-06
+
+Wilcoxon signed-rank test
+
+        Sign |      Obs   Sum ranks    Expected
+-------------+---------------------------------
+    Positive |       52      4317.5        6579
+    Negative |      101      8840.5        6579
+        Zero |        9          45          45
+-------------+---------------------------------
+         All |      162       13203       13203
+
+Unadjusted variance   357581.25
+Adjustment for ties    -1101.38
+Adjustment for zeros     -71.25
+                     ----------
+Adjusted variance     356408.62
+
+H0: b = 0 
+         z = -3.788
+Prob > |z| = 0.0002
+Exact prob = 0.0001
+b-index, treatment 1: Wilcoxon signed-rank two-sided p = .0001518
+
+Wilcoxon signed-rank test
+
+        Sign |      Obs   Sum ranks    Expected
+-------------+---------------------------------
+    Positive |       57        4489        6006
+    Negative |       86        7523        6006
+        Zero |       12          78          78
+-------------+---------------------------------
+         All |      155       12090       12090
+
+Unadjusted variance   313332.50
+Adjustment for ties     -377.00
+Adjustment for zeros    -162.50
+                     ----------
+Adjusted variance     312793.00
+
+H0: b = 0 
+         z = -2.712
+Prob > |z| = 0.0067
+Exact prob = 0.0065
+b-index, treatment 2: Wilcoxon signed-rank two-sided p = .00667937
+
+. 
 . *************************************
 . **# Mann-Whitney tests on the indices
 . *************************************

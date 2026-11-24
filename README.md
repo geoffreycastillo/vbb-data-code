@@ -40,6 +40,7 @@ Text results are printed in `logs/2-analysis.log`, in sections named as below.
 | Figure 4: calibration plot | `results/matching_prob_calibration.pdf` |
 | Figure 5: mean indices by treatment | `results/means_bootstrap.pdf` |
 | Accuracy tests in Section 4 and Online Appendix C.1 | Log section "Accuracy of matching probabilities" |
+| Tests of the indices against zero in Section 4 | Log section "Tests of the indices against ambiguity neutrality" |
 | Mann–Whitney tests on the indices | Log section "Mann-Whitney tests on the indices" |
 | One-sided and two-sided p-values of the treatment effects | Log section "Online Appendix Table C.1" |
 | Online Appendix Table B.1: demographics | `results/summary_statistics.tex` |
